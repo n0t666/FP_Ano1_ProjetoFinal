@@ -34,8 +34,8 @@ typedef struct
 
 
 int menu_principal(void);
-
-
+void submenu_estudantes(void);
+void submenu_ucs(void);
 void pausar(void);
 
 void main(void)
@@ -52,6 +52,7 @@ void main(void)
         switch(menu_principal_op)
         {
         case 1:
+            submenu_estudantes();
             break;
         case 2:
             break;
@@ -89,6 +90,34 @@ int menu_principal()
     printf(" -->");
     scanf("%d",&op);
     return op;
+}
+
+void submenu_estudantes()
+{
+    int op;
+    system("cls||clear");
+    printf(" ******************************************\n");
+    printf(" *           MENU ESTUDANTES              *\n");
+    printf(" ******************************************\n");
+    printf(" * 1 - Registrar novos alunos             *\n");
+    printf(" * 2 - Consultar alunos existentes        *\n");
+    printf(" ******************************************\n\n");
+    printf(" -->");
+    scanf("%d",&op);
+}
+
+void submenu_ucs()
+{
+    int op;
+    system("cls||clear");
+    printf(" ******************************************\n");
+    printf(" *           MENU ESTUDANTES              *\n");
+    printf(" ******************************************\n");
+    printf(" * 1 - Registrar novos alunos             *\n");
+    printf(" * 2 - Consultar alunos existentes        *\n");
+    printf(" ******************************************\n\n");
+    printf(" -->");
+    scanf("%d",&op);
 }
 
 void pausar()
