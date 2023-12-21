@@ -1,6 +1,8 @@
 # depslib dependency file v1.0
-1701370821 source:e:\documentos\tesp_1ano_projetosstandalone\fp_ano1_projetofinal\src\main.c
+1703125506 source:e:\documentos\tesp_1ano_projetosstandalone\fp_ano1_projetofinal\src\main.c
 	<stdio.h>
 	<stdlib.h>
 	<locale.h>
+	<ctype.h>
+	<string.h>
 
