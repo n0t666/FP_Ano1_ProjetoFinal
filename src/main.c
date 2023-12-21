@@ -1,9 +1,29 @@
+/*
+ *
+ * Autores:
+ *  - Leandro Alves Pereira <223175@my.ipleiria.pt> <PL2>
+ *
+ * Data:
+ *
+ * Descrição:
+    - Trabalho realizado no âmbito do projeto final da disciplina de Fundamentos de Programação
+ */
+
+
+//------------------------------------------------------------------------------------------------
+// Bibliotecas de pré-processamento
+//------------------------------------------------------------------------------------------------
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
 #include <ctype.h>
 #include <string.h>
+//-------------------------------------------------------------------------------------------------
 
+
+//------------------------------------------------------------------------------------------------
+// CONSTANTES
+//------------------------------------------------------------------------------------------------
 #define MINIMO_NUMERO_ESTUDANTE 2190000
 
 #define MAXIMO_ESTUDANTES 150
@@ -11,13 +31,16 @@
 #define MAXIMO_UNIDADES_CURRICULARES 18
 
 #define MAXIMO_NUMERO_ESTUDANTE 2299999
-
-
 #define DOMINIO_EMAIL_ESTUDANTES "my.ipleiria.pt"
 
 #define TECLA_ESC 27
 #define TECLA_ENTER 13
+//-------------------------------------------------------------------------------------------------
 
+
+//------------------------------------------------------------------------------------------------
+// Definição das estruturas de dados
+//------------------------------------------------------------------------------------------------
 typedef struct
 {
     int dia,mes,ano;
@@ -41,29 +64,64 @@ typedef struct
     char ano_letivo[20],epoca_avaliacao[50];
     t_data data_avaliacao;
 } t_avaliacao;
+//-------------------------------------------------------------------------------------------------
 
-
-char confirmarSaida(void);
-char confirmarAcao(char msg[]);
-
+//------------------------------------------------------------------------------------------------
+// Funções relacionadas com menus e submenujs
+//------------------------------------------------------------------------------------------------
 int menu_principal(void);
 int submenu_estudantes(void);
 int submenu_ucs(void);
 int submenu_avaliacoes(void);
 int submenu_estatisticas_gerais(void);
 int submenu_estatisticas_especificas(void);
+//-------------------------------------------------------------------------------------------------
 
+
+
+//------------------------------------------------------------------------------------------------
+// Funções utilitárias do programa
+//------------------------------------------------------------------------------------------------
 int ler_numero(int valor_min,int valor_max);
 int ler_tecla(void);
 
-int ler_dados_estudante(t_estudante vetor_estudantes[],int numero_estudantes);
+char confirmarAcao(char msg[]);
+//-------------------------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------------------------
+// Funções relacionadas com a manipulação da  estrutura de dados estudantes
+//------------------------------------------------------------------------------------------------
+
 void mostrar_dados_estudantes(t_estudante vetor_estudantes[],int numero_estudantes);
 void mostrar_dados_estudante(t_estudante vetor_estudantes[],int indice_estudante);
+void mostrar_editar_estudante(t_estudante vetor_estudantes[],int numero_estudantes,int indice_estudante);
+void ler_email_estudante(t_estudante vetor_estudantes[],int numero_estudantes,int indice_especifico);
+
+
 int  procurar_estudante(t_estudante vetor_estudantes[],int numero_estudantes,int numero_estudante);
+int procurar_email_estudante(char email[],t_estudante vetor_estudantes[],int numero_estudantes);
+int validar_email_estudante(char email[],t_estudante vetor_estudantes[],int numero_estudantes);
+int ler_dados_estudante(t_estudante vetor_estudantes[],int numero_estudantes);
+int verificarNumAlunoExistente(t_estudante vetor_estudantes[],int numero_estudantes);
+int verificarNumAlunoInexistente(t_estudante vetor_estudantes[],int numero_estudantes);
+
+
+
+
+//-------------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------------------
+// Funções relacionadas com a manipulação da  estrutura de dados unidade_curricular
+//------------------------------------------------------------------------------------------------
+
+
 int  procurar_unidade_curricular(t_unidade_curricular vetors_ucs[],int numero_ucs,int codigo_uc);
 
+//-------------------------------------------------------------------------------------------------
 
-void main(void)
+int main(void)
 {
 
     setlocale(LC_ALL,"Portuguese");
@@ -87,6 +145,10 @@ void main(void)
         menu_principal_op=menu_principal();
         switch(menu_principal_op)
         {
+        case 0:
+            saida = confirmarAcao("Deseja realmente sair do programa?");
+            break;
+
         case 1:
             do
             {
@@ -154,9 +216,6 @@ void main(void)
             break;
         case 4:
             break;
-        case 5:
-            saida = confirmarSaida();
-            break;
         default:
             printf("\nOpção inválida");
             fflush(stdin);
@@ -178,7 +237,7 @@ int menu_principal()
     printf(" * 2 - Unidades Curriculares              *\n");
     printf(" * 3 - Avaliações                         *\n");
     printf(" * 4 - Estatísticas                       *\n");
-    printf(" * 5 - Sair do programa                   *\n");
+    printf(" * 0 - Sair do programa                   *\n");
     printf(" ******************************************\n\n");
     printf(" -->");
     scanf("%d",&op);
@@ -250,24 +309,12 @@ int submenu_estatisticas_gerais()
     return op;
 }
 
-char confirmarSaida()
-{
-    char confirmacao;
-    do
-    {
-        printf("\nDeseja realmente sair do programa? (S/N): ");
-        scanf(" %c",&confirmacao);
-        confirmacao = toupper(confirmacao);
-    }
-    while(confirmacao != 'S' && confirmacao !='N');
-    return confirmacao;
-}
 char confirmarAcao(char msg[])
 {
     char confirmacao;
     do
     {
-        printf("\nDeseja realmente %s? (S/N): ",msg);
+        printf("\n%s (S/N): ",msg);
         scanf(" %c",&confirmacao);
         confirmacao = toupper(confirmacao);
     }
@@ -299,9 +346,14 @@ int ler_numero(int valor_min,int valor_max)
 int ler_dados_estudante(t_estudante vetor_estudantes[],int numero_estudantes)
 {
     int indice_estudante,numero_estudante;
-    printf("\nEstudante Nº%d\n",numero_estudantes+1);
+
+    system("cls||clear"); // Limpar o ecrã tanto para Windows como para Linux
+
+    printf("************************************************\n");
+    printf("*                  Estudante Nº%d               *\n",numero_estudantes+1);
+    printf("************************************************\n\n");
     vetor_estudantes[numero_estudantes].numero_estudante = verificarNumAlunoInexistente(vetor_estudantes,numero_estudantes);
-    printf("Nome:");
+    printf("\nNome:");
     fflush(stdin);
     scanf("%80[^\n]", vetor_estudantes[numero_estudantes].nome);
     printf("\nCódigo do curso: ");
@@ -372,13 +424,13 @@ int validar_email_estudante(char email[],t_estudante vetor_estudantes[],int nume
             }
             else
             {
-                printf("\nO endereço email já está associado a outro estudante\n");
+                printf("\nO endereço email já está associado a outro estudante,tente novamente: ");
             }
         }
     }
     else   //Se o email não tiver todos os requisitos
     {
-        printf("\nO endereço email deve ser válido\n");
+        printf("\nO endereço email deve ser válido,tente novamente: ");
     }
     return valido;
 }
@@ -394,7 +446,7 @@ void ler_email_estudante(t_estudante vetor_estudantes[],int numero_estudantes,in
         valido=validar_email_estudante(email,vetor_estudantes,numero_estudantes);
     }
     while(valido!=1);  //Enquanto a flag não for 1 (o email não estiver correto)
-    if(indice_especifico==0)
+    if(indice_especifico==-1)
     {
         strcpy(vetor_estudantes[numero_estudantes].email, email); // Copiar o endereço de email válido para a estrutura
     }
@@ -453,40 +505,41 @@ void mostrar_dados_estudante(t_estudante vetor_estudantes[], int indice_estudant
     fflush(stdin);
     printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
     getchar();
-    system("cls||clear"); // Limpar o ecrã tanto para Windows como para Linux
 }
 void mostrar_editar_estudante(t_estudante vetor_estudantes[],int numero_estudantes,int indice_estudante)
 {
-    int ignorar,tecla;
-    mostrar_dados_estudante(vetor_estudantes,indice_estudante);
-    do{
-    if(confirmarAcao("Deseja editar o número de  estudante?")=='S')
+    char sair;
+    do
     {
-        vetor_estudantes[indice_estudante].numero_estudante = verificarNumAlunoInexistente(vetor_estudantes,numero_estudantes);
-    }
+        mostrar_dados_estudante(vetor_estudantes,indice_estudante);
+        if(confirmarAcao("Deseja editar o número de  estudante?")=='S')
+        {
+            printf("\n");
+            vetor_estudantes[indice_estudante].numero_estudante = verificarNumAlunoInexistente(vetor_estudantes,numero_estudantes);
+        }
 
-    if(confirmarAcao("Deseja editar o nome?")=='S')
-    {
-        printf("Novo nome: ");
-        fflush(stdin);
-        scanf("%80[^\n]", vetor_estudantes[indice_estudante].nome);
-    }
+        if(confirmarAcao("Deseja editar o nome?")=='S')
+        {
+            printf("\nNovo nome: ");
+            fflush(stdin);
+            scanf("%80[^\n]", vetor_estudantes[indice_estudante].nome);
+        }
 
 
-    if(confirmarAcao("Deseja editar o  email?")=='S')
-    {
-        printf("\nNovo email: ");
-        ler_email_estudante(vetor_estudantes,numero_estudantes,indice_estudante);
+        if(confirmarAcao("Deseja editar o  email?")=='S')
+        {
+            printf("\nNovo email: ");
+            ler_email_estudante(vetor_estudantes,numero_estudantes,indice_estudante);
+        }
+        if(confirmarAcao("Deseja editar o código do curso?")=='S')
+        {
+            printf("\nNovo código de curso: ");
+            scanf("%d", &vetor_estudantes[indice_estudante].cod_curso);
+        }
+        printf("-----------------------------------------------");
+        sair = confirmarAcao("Continuar no modo edição?");
     }
-    if(confirmarAcao("Deseja editar o código do curso?")=='S')
-    {
-        printf("Novo email: ");
-        fflush(stdin);
-        scanf("%80[^\n]", vetor_estudantes[indice_estudante].nome);
-    }
-    printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR OU <ESC> PARA SAIR...");
-    tecla = ler_tecla();
-    }while(tecla != TECLA_ESC);
+    while(sair=='S');
 }
 
 int verificarNumAlunoExistente(t_estudante vetor_estudantes[],int numero_estudantes)
@@ -536,4 +589,5 @@ int ler_tecla()
 
     return numero_tecla;
 }
+
 
