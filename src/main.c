@@ -82,10 +82,29 @@ int submenu_estatisticas_especificas(void);
 //------------------------------------------------------------------------------------------------
 // Funções utilitárias do programa
 //------------------------------------------------------------------------------------------------
+void lerNumCardinal(char* resultado,int len,char sufixo[],int max,int min);
+
 int ler_numero(int valor_min,int valor_max);
 int ler_tecla(void);
 
 char confirmarAcao(char msg[]);
+//-------------------------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------------------------
+// Funções relacionados com os ficheiros
+//------------------------------------------------------------------------------------------------
+
+//Leitura
+void gravarFicheiroEstudantes(t_estudante vetor_estudantes[],int numero_estudantes);
+void gravarFicheiroUcs(t_unidade_curricular vetor_ucs[],int numero_ucs);
+void gravarFicheiroAvaliacoes(t_avaliacao vetor_avaliacoes[],int numero_avaliacoes);
+
+//Escrita
+
+
+
 //-------------------------------------------------------------------------------------------------
 
 
@@ -116,8 +135,14 @@ int verificarNumAlunoInexistente(t_estudante vetor_estudantes[],int numero_estud
 // Funções relacionadas com a manipulação da  estrutura de dados unidade_curricular
 //------------------------------------------------------------------------------------------------
 
+int ler_dados_unidade_curricular(t_unidade_curricular vetors_ucs[],int numero_ucs);
+int procurar_unidade_curricular(t_unidade_curricular vetors_ucs[],int numero_ucs,int codigo_uc);
 
-int  procurar_unidade_curricular(t_unidade_curricular vetors_ucs[],int numero_ucs,int codigo_uc);
+int verificarUcExistente(t_unidade_curricular vetors_ucs[],int numero_ucs);
+int verificarUcInexistente(t_unidade_curricular vetors_ucs[],int numero_ucs);
+
+void mostrar_dados_ucs(t_unidade_curricular vetors_ucs[],int numero_ucs);
+void mostrar_dados_uc(t_unidade_curricular vetors_ucs[],int codigo_uc);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -138,17 +163,21 @@ int main(void)
 
     char saida;
 
+    numero_estudantes=lerFicheiroEstudantes(vetor_estudantes);
+    numeros_ucs = lerFicheiroUcs(vetor_ucs);
+    numero_avaliacoes = lerFicheiroAvaliacoes(vetor_avaliacoes);
+
 
     do
     {
         system("cls||clear");
+
         menu_principal_op=menu_principal();
         switch(menu_principal_op)
         {
         case 0:
             saida = confirmarAcao("Deseja realmente sair do programa?");
             break;
-
         case 1:
             do
             {
@@ -207,10 +236,19 @@ int main(void)
         case 2:
             do
             {
-
                 submenu_ucs_op = submenu_ucs();
+                switch(submenu_ucs_op)
+                {
+                case 1:
+                    numeros_ucs = ler_dados_unidade_curricular(vetor_ucs,numeros_ucs);
+                    break;
+                case 2:
+                    mostrar_dados_ucs(vetor_ucs,numeros_ucs);
+                    break;
+
+                }
             }
-            while(submenu_ucs_op!=3);
+            while(submenu_ucs_op!=0);
             break;
         case 3:
             break;
@@ -225,6 +263,9 @@ int main(void)
         }
     }
     while(saida!='S');
+    gravarFicheiroEstudantes(vetor_estudantes,numero_estudantes);
+    gravarFicheiroUcs(vetor_ucs,numeros_ucs);
+    gravarFicheiroAvaliacoes(vetor_avaliacoes,numero_avaliacoes);
 }
 
 int menu_principal()
@@ -266,12 +307,12 @@ int submenu_ucs()
 {
     int op;
     system("cls||clear");
-    printf(" *************************************************\n");
-    printf(" *            MENU UNIDADES CURRICULARES         *\n");
-    printf(" *************************************************\n");
-    printf(" * 1 - Registrar novas unidades curriculares     *\n");
-    printf(" * 2 - Consultar alunos existentes               *\n");
-    printf(" ************************************************\n\n");
+    printf(" **************************************************\n");
+    printf(" *            MENU UNIDADES CURRICULARES         **\n");
+    printf(" **************************************************\n");
+    printf(" * 1 - Registrar novas unidades curriculares      *\n");
+    printf(" * 2 - Consultar unidades curriculares existentes *\n");
+    printf(" **************************************************\n\n");
     printf(" -->");
     scanf("%d",&op);
     return op;
@@ -330,11 +371,13 @@ int ler_numero(int valor_min,int valor_max)
         scanf("%d",&num);
         if(num < valor_min)
         {
-            printf("\nO número está abaixo do valor pretendido,tente novamente: ");
+            printf("\nO número está abaixo do valor pretendido (Os valores devem estar entre %d e %d)",valor_min,valor_max);
+            printf("\n\nIntroduza o valor novamente: ");
         }
         else if(num > valor_max)
         {
-            printf("\nO número está acima do valor pretendido,tente novamente: ");
+            printf("\nO número está acima do valor pretendido (Os valores devem estar entre %d e %d)",valor_min,valor_max);
+            printf("\n\nIntroduza o valor novamente novamente: ");
         }
     }
     while(num < valor_min || num > valor_max);
@@ -345,21 +388,18 @@ int ler_numero(int valor_min,int valor_max)
 
 int ler_dados_estudante(t_estudante vetor_estudantes[],int numero_estudantes)
 {
-    int indice_estudante,numero_estudante;
-
     system("cls||clear"); // Limpar o ecrã tanto para Windows como para Linux
-
     printf("************************************************\n");
     printf("*                  Estudante Nº%d               *\n",numero_estudantes+1);
     printf("************************************************\n\n");
     vetor_estudantes[numero_estudantes].numero_estudante = verificarNumAlunoInexistente(vetor_estudantes,numero_estudantes);
-    printf("\nNome:");
+    printf("\nNome: ");
     fflush(stdin);
     scanf("%80[^\n]", vetor_estudantes[numero_estudantes].nome);
     printf("\nCódigo do curso: ");
     scanf("%d",&vetor_estudantes[numero_estudantes].cod_curso);
     printf("\nEmail: ");
-    ler_email_estudante(vetor_estudantes,numero_estudantes,0);
+    ler_email_estudante(vetor_estudantes,numero_estudantes,-1);
     vetor_estudantes[numero_estudantes].id = numero_estudantes +1;
     fflush(stdin);
     printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
@@ -367,6 +407,44 @@ int ler_dados_estudante(t_estudante vetor_estudantes[],int numero_estudantes)
     system("cls||clear"); // Limpar o ecrã tanto para Windows como para Linux
     numero_estudantes++;
     return numero_estudantes;
+}
+
+int ler_dados_unidade_curricular(t_unidade_curricular vetor_ucs[],int numero_ucs)
+{
+    system("cls||clear");
+    printf("************************************************\n");
+    printf("*             Unidade Curricular Nº%d          *\n",numero_ucs+1);
+    printf("************************************************\n\n");
+    vetor_ucs[numero_ucs].cod_uc = verificarUcInexistente(vetor_ucs,numero_ucs);
+    printf("\nNome: ");
+    fflush(stdin);
+    scanf("%50[^\n]", vetor_ucs[numero_ucs].nome_uc);
+    printf("\nAno curricular: ");
+    lerNumCardinal(vetor_ucs[numero_ucs].ano_curricular,sizeof(vetor_ucs[numero_ucs].ano_curricular),"º Ano",8,1);
+    printf("\nSemestre: ");
+    lerNumCardinal(vetor_ucs[numero_ucs].semestre,sizeof(vetor_ucs[numero_ucs].semestre),"º Semestre",10,1);
+    printf("\nECTS: ");
+    scanf("%d",&vetor_ucs[numero_ucs].ects);
+    vetor_ucs[numero_ucs].id = numero_ucs +1;
+    fflush(stdin);
+    printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+    getchar();
+    system("cls||clear");
+    numero_ucs++;
+    return numero_ucs;
+}
+
+void lerNumCardinal(char* resultado,int len,char sufixo[],int max,int min)
+{
+    char frase[50];
+    int numero;
+
+    numero = ler_numero(min,max);
+
+    sprintf(frase,"%d %s",numero,sufixo);
+
+    strcpy(resultado,frase);
+    resultado[len-1] =0;
 }
 
 
@@ -473,7 +551,6 @@ int procurar_email_estudante(char email[],t_estudante vetor_estudantes[],int num
 
 void mostrar_dados_estudantes(t_estudante vetor_estudantes[], int numero_estudantes)
 {
-    printf("\n%d\n",numero_estudantes);
     printf("ID  | Nome                                                                           | Número de estudante | Código Curso | Email\n");
     printf("----|--------------------------------------------------------------------------------|---------------------|--------------|-------\n");
     for (int indice = 0; indice < numero_estudantes; indice++)
@@ -506,6 +583,37 @@ void mostrar_dados_estudante(t_estudante vetor_estudantes[], int indice_estudant
     printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
     getchar();
 }
+
+void mostrar_dados_ucs(t_unidade_curricular vetors_ucs[],int numero_ucs)
+{
+    printf("ID  | Nome da UC                                       | Código da UC | Ano curricular | Semestre      | ECTS\n");
+    printf("----|--------------------------------------------------|--------------|----------------|---------------|------\n");
+    for (int indice = 0; indice < numero_ucs; indice++)
+    {
+        printf("%-4d| %-48s | %-12d | %-14s | %-13s | %-6d\n",
+               vetors_ucs[indice].id,
+               vetors_ucs[indice].nome_uc,
+               vetors_ucs[indice].cod_uc,
+               vetors_ucs[indice].ano_curricular,
+               vetors_ucs[indice].semestre,
+               vetors_ucs[indice].ects
+              );
+    }
+    printf("----|--------------------------------------------------|--------------|----------------|---------------|------\n");
+    fflush(stdin);
+    getchar();
+
+}
+void mostrar_dados_uc(t_unidade_curricular vetors_ucs[],int codigo_uc)
+{
+
+}
+
+
+
+
+
+
 void mostrar_editar_estudante(t_estudante vetor_estudantes[],int numero_estudantes,int indice_estudante)
 {
     char sair;
@@ -581,6 +689,46 @@ int verificarNumAlunoInexistente(t_estudante vetor_estudantes[],int numero_estud
     return numero_estudante;
 }
 
+int verificarUcExistente(t_unidade_curricular vetors_ucs[],int numero_ucs)
+{
+    int indice_uc,codigo_uc;
+    do
+    {
+        scanf("%d",&codigo_uc);
+        indice_uc = procurar_unidade_curricular(vetors_ucs,numero_ucs,codigo_uc);
+        if(indice_uc == -1)
+        {
+            printf("\n(Erro:A unidade curricular com o código %d não existe),tente novamente:",codigo_uc);
+            fflush(stdin);
+            getchar();
+        }
+    }
+    while(indice_uc == -1);
+
+    return codigo_uc;
+}
+
+int verificarUcInexistente(t_unidade_curricular vetors_ucs[],int numero_ucs)
+{
+    int indice_uc,codigo_uc;
+    do
+    {
+        printf("Código da unidade curricular: ");
+        scanf("%d",&codigo_uc);
+        indice_uc = procurar_unidade_curricular(vetors_ucs,numero_ucs,codigo_uc);
+        if(indice_uc != -1)
+        {
+            printf("\n(Erro: A unidade curricular já existe!),tente novamente:");
+            fflush(stdin);
+            getchar();
+        }
+    }
+    while(indice_uc !=-1);
+
+    return codigo_uc;
+}
+
+
 int ler_tecla()
 {
     int numero_tecla;
@@ -590,4 +738,162 @@ int ler_tecla()
     return numero_tecla;
 }
 
+void gravarFicheiroEstudantes(t_estudante vetor_estudantes[],int numero_estudantes)
+{
+    FILE *ficheiro;
+    ficheiro = fopen("estudantes.dat","wb");
+    if(ficheiro == NULL)
+    {
+        printf("Não foi posível criar o ficheiro");
+    }
+    else
+    {
+        fwrite(&numero_estudantes,sizeof(int),1,ficheiro);
+        fwrite(vetor_estudantes,sizeof(t_estudante),numero_estudantes,ficheiro);
 
+
+        fclose(ficheiro);
+        printf("\nEscrita dos dados de %d alunos em ficheiro com sucesso.",numero_estudantes);
+    }
+}
+
+void gravarFicheiroUcs(t_unidade_curricular vetor_ucs[],int numero_ucs)
+{
+    FILE *ficheiro;
+    ficheiro = fopen("unidades_curriculares.dat","wb");
+    if(ficheiro == NULL)
+    {
+        printf("Não foi posível criar o ficheiro");
+    }
+    else
+    {
+        fwrite(&numero_ucs,sizeof(int),1,ficheiro);
+        fwrite(vetor_ucs,sizeof(t_unidade_curricular),numero_ucs,ficheiro);
+        fclose(ficheiro);
+        printf("\nEscrita dos dados de %d unidades curriculares em ficheiro com sucesso.",numero_ucs);
+    }
+}
+
+void gravarFicheiroAvaliacoes(t_avaliacao vetor_avaliacoes[],int numero_avaliacoes)
+{
+    FILE *ficheiro;
+    ficheiro = fopen("avaliacoes.dat","wb");
+    if(ficheiro == NULL)
+    {
+        printf("Não foi posível criar o ficheiro");
+    }
+    else
+    {
+        fwrite(&numero_avaliacoes,sizeof(int),1,ficheiro);
+        fwrite(vetor_avaliacoes,sizeof(t_avaliacao),numero_avaliacoes,ficheiro);
+
+        fclose(ficheiro);
+        printf("\nEscrita dos dados de %d avaliações em ficheiro com sucesso.",numero_avaliacoes);
+    }
+
+}
+
+int lerFicheiroEstudantes(t_estudante vetor_estudantes[])
+{
+    int numero_estudantes=0,numero_estudantes_lido=0;
+    FILE *ficheiro;
+    ficheiro = fopen("estudantes.dat","rb");
+    if(ficheiro == NULL)
+    {
+        printf("Não foi posível ler o ficheiro");
+        printf("O ficheiro não existe. Será criado um novo ficheiro vazio.\n");
+        ficheiro = fopen("estudantes.dat", "wb");
+        if (ficheiro != NULL)
+        {
+            fwrite(&numero_estudantes, sizeof(int), 1, ficheiro);
+            fwrite(vetor_estudantes,sizeof(t_estudante),numero_estudantes,ficheiro);
+            fclose(ficheiro);
+        }
+    }
+    else
+    {
+        fread(&numero_estudantes,sizeof(int),1,ficheiro);
+        numero_estudantes_lido = fread(vetor_estudantes,sizeof(t_estudante),numero_estudantes,ficheiro);
+        fclose(ficheiro);
+        if(numero_estudantes_lido != numero_estudantes)
+        {
+            printf("Erro na leitura de dados do ficheiro!");
+        }
+        else
+        {
+            printf("\nLeitura de %d alunos do ficheiro com sucesso.",numero_estudantes_lido);
+        }
+    }
+
+    return numero_estudantes_lido;
+}
+
+int lerFicheiroUcs(t_unidade_curricular vetor_ucs[])
+{
+    int numero_ucs=0,numero_ucs_lido=0;
+    FILE *ficheiro;
+    ficheiro = fopen("unidades_curriculares.dat","rb");
+    if(ficheiro == NULL)
+    {
+        printf("Não foi posível ler o ficheiro");
+        printf("O ficheiro não existe. Será criado um novo ficheiro vazio.\n");
+        ficheiro = fopen("unidades_curriculares.dat", "wb");
+        if (ficheiro != NULL)
+        {
+            fwrite(&numero_ucs, sizeof(int), 1, ficheiro);
+            fwrite(vetor_ucs,sizeof(t_unidade_curricular),numero_ucs,ficheiro);
+            fclose(ficheiro);
+        }
+    }
+    else
+    {
+        fread(&numero_ucs,sizeof(int),1,ficheiro);
+        numero_ucs_lido = fread(vetor_ucs,sizeof(t_unidade_curricular),numero_ucs,ficheiro);
+        fclose(ficheiro);
+        if(numero_ucs_lido != numero_ucs)
+        {
+            printf("Erro na leitura de dados do ficheiro!");
+        }
+        else
+        {
+            printf("\nLeitura de %d unidades curriculares do ficheiro com sucesso.",numero_ucs_lido);
+        }
+    }
+
+    return numero_ucs_lido;
+}
+
+int lerFicheiroAvaliacoes(t_avaliacao vetor_avaliacoes[])
+{
+    int numero_avaliacoes=0,numero_avaliacoes_lido=0;
+    FILE *ficheiro;
+    ficheiro = fopen("avaliacoes.dat","rb");
+    if(ficheiro == NULL)
+    {
+        printf("O ficheiro não existe. Será criado um novo ficheiro vazio.\n");
+        ficheiro = fopen("avaliacoes.dat", "wb");
+        if (ficheiro != NULL)
+        {
+            fwrite(&numero_avaliacoes, sizeof(int), 1, ficheiro);
+            fwrite(vetor_avaliacoes,sizeof(t_avaliacao),numero_avaliacoes,ficheiro);
+            fclose(ficheiro);
+        }
+
+    }
+    else
+    {
+        fread(&numero_avaliacoes,sizeof(int),1,ficheiro);
+        numero_avaliacoes_lido = fread(vetor_avaliacoes,sizeof(t_avaliacao),numero_avaliacoes,ficheiro);
+        fclose(ficheiro);
+        if(numero_avaliacoes_lido != numero_avaliacoes)
+        {
+            printf("Erro na leitura de dados do ficheiro!");
+        }
+        else
+        {
+            printf("\nLeitura de %d unidades curriculares do ficheiro com sucesso.",numero_avaliacoes_lido);
+        }
+    }
+
+    return numero_avaliacoes_lido;
+}
