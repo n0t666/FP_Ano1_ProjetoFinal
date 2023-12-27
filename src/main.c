@@ -159,13 +159,16 @@ int main(void)
 
     int numero_estudantes=0,numeros_ucs=0,numero_avaliacoes=0;
 
-    int numero_estudante,indice_estudante;
+    int indice_estudante,indice_uc;
 
     char saida;
 
     numero_estudantes=lerFicheiroEstudantes(vetor_estudantes);
     numeros_ucs = lerFicheiroUcs(vetor_ucs);
     numero_avaliacoes = lerFicheiroAvaliacoes(vetor_avaliacoes);
+
+    printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+    getchar();
 
 
     do
@@ -243,9 +246,45 @@ int main(void)
                     numeros_ucs = ler_dados_unidade_curricular(vetor_ucs,numeros_ucs);
                     break;
                 case 2:
-                    mostrar_dados_ucs(vetor_ucs,numeros_ucs);
+                    if(numeros_ucs>0)
+                    {
+                        mostrar_dados_ucs(vetor_ucs,numeros_ucs);
+                    }
+                    else
+                    {
+                        printf("\nPara usar esta opção necessita de ter pelo menos 1 UC inserido no sistema");
+                        fflush(stdin);
+                        getchar();
+                    }
                     break;
-
+                case 3:
+                    if(numeros_ucs>0)
+                    {
+                        printf("\nIntroduza o código da UC que pretende consultar: ");
+                        indice_uc = verificarUcExistente(vetor_ucs,numeros_ucs);
+                        mostrar_dados_uc(vetor_ucs,indice_uc);
+                    }
+                    else
+                    {
+                        printf("\nPara usar esta opção necessita de ter pelo menos 1 UC inserido no sistema");
+                        fflush(stdin);
+                        getchar();
+                    }
+                    break;
+                case 4:
+                    if(numeros_ucs>0)
+                    {
+                        printf("\nIntroduza o código da UC que pretende editar: ");
+                        indice_uc = verificarUcExistente(vetor_ucs,numeros_ucs);
+                        mostrar_editar_uc(vetor_ucs,numeros_ucs,indice_uc);
+                    }
+                    else
+                    {
+                        printf("\nPara usar esta opção necessita de ter pelo menos 1 UC inserido no sistema");
+                        fflush(stdin);
+                        getchar();
+                    }
+                    break;
                 }
             }
             while(submenu_ucs_op!=0);
@@ -312,6 +351,9 @@ int submenu_ucs()
     printf(" **************************************************\n");
     printf(" * 1 - Registrar novas unidades curriculares      *\n");
     printf(" * 2 - Consultar unidades curriculares existentes *\n");
+    printf(" * 3 - Consultar unidade curricular existente     *\n");
+    printf(" * 4 - Editar unidade curricular específica       *\n");
+    printf(" * 0 - Voltar                                     *\n");
     printf(" **************************************************\n\n");
     printf(" -->");
     scanf("%d",&op);
@@ -470,7 +512,7 @@ int procurar_unidade_curricular(t_unidade_curricular vetor_ucs[],int numero_ucs,
 
     for(int indice=0; indice < numero_ucs; indice++)
     {
-        if(vetor_ucs[indice].cod_uc == numero_ucs)
+        if(vetor_ucs[indice].cod_uc == codigo_uc)
         {
             encontrado =indice;
         }
@@ -584,19 +626,19 @@ void mostrar_dados_estudante(t_estudante vetor_estudantes[], int indice_estudant
     getchar();
 }
 
-void mostrar_dados_ucs(t_unidade_curricular vetors_ucs[],int numero_ucs)
+void mostrar_dados_ucs(t_unidade_curricular vetor_ucs[],int numero_ucs)
 {
     printf("ID  | Nome da UC                                       | Código da UC | Ano curricular | Semestre      | ECTS\n");
     printf("----|--------------------------------------------------|--------------|----------------|---------------|------\n");
     for (int indice = 0; indice < numero_ucs; indice++)
     {
         printf("%-4d| %-48s | %-12d | %-14s | %-13s | %-6d\n",
-               vetors_ucs[indice].id,
-               vetors_ucs[indice].nome_uc,
-               vetors_ucs[indice].cod_uc,
-               vetors_ucs[indice].ano_curricular,
-               vetors_ucs[indice].semestre,
-               vetors_ucs[indice].ects
+               vetor_ucs[indice].id,
+               vetor_ucs[indice].nome_uc,
+               vetor_ucs[indice].cod_uc,
+               vetor_ucs[indice].ano_curricular,
+               vetor_ucs[indice].semestre,
+               vetor_ucs[indice].ects
               );
     }
     printf("----|--------------------------------------------------|--------------|----------------|---------------|------\n");
@@ -604,14 +646,23 @@ void mostrar_dados_ucs(t_unidade_curricular vetors_ucs[],int numero_ucs)
     getchar();
 
 }
-void mostrar_dados_uc(t_unidade_curricular vetors_ucs[],int codigo_uc)
+void mostrar_dados_uc(t_unidade_curricular vetor_ucs[],int codigo_uc)
 {
-
+    system("cls||clear");
+    printf(" **********************************************************************************************\n");
+    printf("                                    Unidade Curricular Nº.%d                                   \n",vetor_ucs[codigo_uc].id);
+    printf(" **********************************************************************************************\n");
+    printf("   ID: %d                                                                                      \n",vetor_ucs[codigo_uc].id);
+    printf("   Código da UC: %d                                                                            \n",vetor_ucs[codigo_uc].cod_uc);
+    printf("   Nome: %s                                                                                    \n",vetor_ucs[codigo_uc].nome_uc);
+    printf("   Ano curricular: %s                                                                          \n",vetor_ucs[codigo_uc].ano_curricular);
+    printf("   Semestre: %s                                                                                \n",vetor_ucs[codigo_uc].semestre);
+    printf("   ECTS: %d                                                                                    \n",vetor_ucs[codigo_uc].ects);
+    printf(" **********************************************************************************************\n\n");
+    fflush(stdin);
+    printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+    getchar();
 }
-
-
-
-
 
 
 void mostrar_editar_estudante(t_estudante vetor_estudantes[],int numero_estudantes,int indice_estudante)
@@ -649,6 +700,47 @@ void mostrar_editar_estudante(t_estudante vetor_estudantes[],int numero_estudant
     }
     while(sair=='S');
 }
+
+
+void mostrar_editar_uc(t_unidade_curricular vetor_ucs[],int numero_ucs,int indice_uc)
+{
+    char sair;
+    printf("\nAno curricular: ");
+    do
+    {
+        mostrar_dados_uc(vetor_ucs,indice_uc);
+        if(confirmarAcao("Deseja editar o código da  UC?")=='S')
+        {
+            printf("\n");
+            vetor_ucs[indice_uc].cod_uc = verificarUcInexistente(vetor_ucs,numero_ucs);
+        }
+        if(confirmarAcao("Deseja editar o nome?")=='S')
+        {
+            printf("\nNovo nome: ");
+            fflush(stdin);
+            scanf("%50[^\n]", vetor_ucs[indice_uc].nome_uc);
+        }
+        if(confirmarAcao("Deseja editar  o campo ECTS?")=='S')
+        {
+            printf("\nNovo ECTS: ");
+            scanf("%d",&vetor_ucs[indice_uc].ects);
+        }
+        if(confirmarAcao("Deseja editar o ano curricular da UC?")=='S')
+        {
+            printf("\nNovo ano curricular: ");
+            lerNumCardinal(vetor_ucs[indice_uc].ano_curricular,sizeof(vetor_ucs[indice_uc].ano_curricular),"º Ano",8,1);
+        }
+        if(confirmarAcao("Deseja editar o semestre da UC?")=='S')
+        {
+            printf("\nNovo semestre: ");
+            lerNumCardinal(vetor_ucs[indice_uc].semestre,sizeof(vetor_ucs[indice_uc].semestre),"º Semestre",10,1);
+        }
+        printf("-----------------------------------------------");
+        sair = confirmarAcao("Continuar no modo edição?");
+    }
+    while(sair=='S');
+}
+
 
 int verificarNumAlunoExistente(t_estudante vetor_estudantes[],int numero_estudantes)
 {
@@ -689,13 +781,13 @@ int verificarNumAlunoInexistente(t_estudante vetor_estudantes[],int numero_estud
     return numero_estudante;
 }
 
-int verificarUcExistente(t_unidade_curricular vetors_ucs[],int numero_ucs)
+int verificarUcExistente(t_unidade_curricular vetor_ucs[],int numero_ucs)
 {
     int indice_uc,codigo_uc;
     do
     {
         scanf("%d",&codigo_uc);
-        indice_uc = procurar_unidade_curricular(vetors_ucs,numero_ucs,codigo_uc);
+        indice_uc = procurar_unidade_curricular(vetor_ucs,numero_ucs,codigo_uc);
         if(indice_uc == -1)
         {
             printf("\n(Erro:A unidade curricular com o código %d não existe),tente novamente:",codigo_uc);
@@ -705,17 +797,17 @@ int verificarUcExistente(t_unidade_curricular vetors_ucs[],int numero_ucs)
     }
     while(indice_uc == -1);
 
-    return codigo_uc;
+    return indice_uc;
 }
 
-int verificarUcInexistente(t_unidade_curricular vetors_ucs[],int numero_ucs)
+int verificarUcInexistente(t_unidade_curricular vetor_ucs[],int numero_ucs)
 {
     int indice_uc,codigo_uc;
     do
     {
         printf("Código da unidade curricular: ");
         scanf("%d",&codigo_uc);
-        indice_uc = procurar_unidade_curricular(vetors_ucs,numero_ucs,codigo_uc);
+        indice_uc = procurar_unidade_curricular(vetor_ucs,numero_ucs,codigo_uc);
         if(indice_uc != -1)
         {
             printf("\n(Erro: A unidade curricular já existe!),tente novamente:");
