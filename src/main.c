@@ -35,6 +35,9 @@
 
 #define TECLA_ESC 27
 #define TECLA_ENTER 13
+
+#define DATA_MINIMA 2000
+
 //-------------------------------------------------------------------------------------------------
 
 
@@ -199,6 +202,7 @@ int main(void)
                     {
                         printf("\nPara usar esta opção necessita de ter pelo menos 1 estudante inserido no sistema");
                         fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
                         getchar();
                     }
                     break;
@@ -214,6 +218,7 @@ int main(void)
                     {
                         printf("\nPara usar esta opção necessita de ter pelo menos 1 estudante inserido no sistema");
                         fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
                         getchar();
                     }
                     break;
@@ -229,6 +234,7 @@ int main(void)
                     {
                         printf("\nPara usar esta opção necessita de ter pelo menos 1 estudante inserido no sistema");
                         fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
                         getchar();
                     }
                     break;
@@ -254,6 +260,7 @@ int main(void)
                     {
                         printf("\nPara usar esta opção necessita de ter pelo menos 1 UC inserido no sistema");
                         fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
                         getchar();
                     }
                     break;
@@ -268,6 +275,7 @@ int main(void)
                     {
                         printf("\nPara usar esta opção necessita de ter pelo menos 1 UC inserido no sistema");
                         fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
                         getchar();
                     }
                     break;
@@ -282,6 +290,7 @@ int main(void)
                     {
                         printf("\nPara usar esta opção necessita de ter pelo menos 1 UC inserido no sistema");
                         fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
                         getchar();
                     }
                     break;
@@ -290,6 +299,23 @@ int main(void)
             while(submenu_ucs_op!=0);
             break;
         case 3:
+            do
+            {
+                submenu_avaliacoes_op = submenu_avaliacoes();
+                switch(submenu_avaliacoes_op)
+                {
+                case 1:
+                    numero_avaliacoes = ler_dados_avaliacao(vetor_avaliacoes,numero_avaliacoes,vetor_estudantes,numero_estudantes,vetor_ucs,numeros_ucs);
+                    break;
+                case 2:
+                    mostrar_dados_avaliacoes(vetor_avaliacoes,numero_avaliacoes);
+                    break;
+                default:
+                    printf("\nOpção inválida");
+                }
+
+            }
+            while(submenu_avaliacoes_op!=0);
             break;
         case 4:
             break;
@@ -360,6 +386,7 @@ int submenu_ucs()
     return op;
 }
 
+
 int submenu_avaliacoes()
 {
     int op;
@@ -384,12 +411,40 @@ int submenu_estatisticas_gerais()
     printf(" *           MENU ESTATÍSTICAS ESPECÍFICAS       *\n");
     printf(" ************************************************\n");
     printf(" * Total de ECTS aprovados pelos estudantes:     *\n");
-    printf(" * 2 - Consultar avaliações existentes          *\n");
     printf(" * 0 - Voltar                                   *\n");
     printf(" ************************************************\n\n");
     printf(" -->");
     scanf("%d",&op);
     return op;
+}
+
+void escolha_epoca_avaliacao(char* str)
+{
+    int op;
+    printf("\n");
+    printf("************************************************\n");
+    printf("*           Escolha a época de avaliação:      *\n");
+    printf("************************************************\n");
+    printf("\n1 -  Avaliação Final Semestre");
+    printf("\n2 -  Avaliação De Recurso");
+    printf("\n3 -  Avaliação De Época Especial");
+    printf("\n-->");
+    scanf("%d",&op);
+    switch(op)
+    {
+    case 1:
+        strcpy(str,"Avaliação Final Semestre");
+        break;
+    case 2:
+        strcpy(str,"Avaliação De Recurso");
+        break;
+    case 3:
+        strcpy(str,"Avaliação De Época Especial");
+        break;
+    default:
+        printf("\nPor favor,escolha uma opção válida\n");
+    }
+
 }
 
 char confirmarAcao(char msg[])
@@ -433,7 +488,7 @@ int ler_dados_estudante(t_estudante vetor_estudantes[],int numero_estudantes)
     system("cls||clear"); // Limpar o ecrã tanto para Windows como para Linux
     printf("************************************************\n");
     printf("*                  Estudante Nº%d               *\n",numero_estudantes+1);
-    printf("************************************************\n\n");
+    printf("************************************************\n");
     vetor_estudantes[numero_estudantes].numero_estudante = verificarNumAlunoInexistente(vetor_estudantes,numero_estudantes);
     printf("\nNome: ");
     fflush(stdin);
@@ -474,6 +529,128 @@ int ler_dados_unidade_curricular(t_unidade_curricular vetor_ucs[],int numero_ucs
     system("cls||clear");
     numero_ucs++;
     return numero_ucs;
+}
+
+int ler_dados_avaliacao(t_avaliacao vetor_avaliacoes[],int numero_avaliacoes,t_estudante vetor_estudantes[],int numero_estudantes,t_unidade_curricular vetor_ucs[],int numero_ucs)
+{
+    int indice_estudante,indice_uc,ano_letivo_valido;
+    char ano_letivo[20];
+    system("cls||clear");
+    printf("************************************************\n");
+    printf("*                 Avaliação  Nº%d              *\n",numero_avaliacoes+1);
+    printf("************************************************\n\n");
+    vetor_avaliacoes[numero_avaliacoes].id = numero_avaliacoes + 1;
+    printf("\nNúmero do aluno: ");
+    indice_estudante= verificarNumAlunoExistente(vetor_estudantes,numero_estudantes);
+    printf("\nCódigo da unidade curricular: ");
+    indice_uc = verificarUcExistente(vetor_ucs,numero_ucs);
+    vetor_avaliacoes[numero_avaliacoes].id_estudante = vetor_estudantes[indice_estudante].id;
+    vetor_avaliacoes[numero_avaliacoes].id_uc = vetor_ucs[indice_uc].id;
+    printf("\nAno letivo: ");
+    do
+    {
+        fflush(stdin);
+        scanf("%20[^\n]", ano_letivo);
+        ano_letivo_valido=validarAnoLetivo(ano_letivo);
+    }
+    while(ano_letivo_valido!=1);
+    strcpy(vetor_avaliacoes[numero_avaliacoes].ano_letivo,ano_letivo);
+    escolha_epoca_avaliacao(vetor_avaliacoes[numero_avaliacoes].epoca_avaliacao);
+    ler_data_avaliacao(vetor_avaliacoes,numero_avaliacoes);
+    printf("\nClassificação final: ");
+    vetor_avaliacoes[numero_avaliacoes].classificao_final=ler_numero(0,20);
+    printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+    getchar();
+    system("cls||clear");
+    numero_avaliacoes++;
+    return numero_avaliacoes;
+}
+
+
+void ler_data_avaliacao(t_avaliacao vetor_avaliacoes[],int indice_avaliacao)
+{
+    int dia,mes,ano,dataValida;
+
+    printf("\nData (DIA/MÊS/ANO): ");
+    do
+    {
+        scanf("%d/%d/%d",&dia,&mes,&ano);
+        dataValida = validarData(dia,mes,ano);
+        if(dataValida !=1)
+        {
+            printf("\Introduza a data novamente: ");
+        }
+    }
+    while(dataValida!=1);
+
+    vetor_avaliacoes[indice_avaliacao].data_avaliacao.ano = ano;
+    vetor_avaliacoes[indice_avaliacao].data_avaliacao.mes = mes;
+    vetor_avaliacoes[indice_avaliacao].data_avaliacao.dia = dia;
+}
+
+
+int validarData(int dia,int mes,int ano)
+{
+    int isValido = 0,maximo_dias = 31;
+    if( ano >= DATA_MINIMA && mes > 0 && mes <= 12 && dia > 1)
+    {
+        if(mes == 4 || mes == 6 || mes == 9 || mes == 11)
+        {
+            maximo_dias = 30;
+        }
+        else if (mes==2)
+        {
+            if(verificarAnoBissexto(ano))
+            {
+                maximo_dias = 29;
+            }
+            else
+            {
+                maximo_dias = 28;
+            }
+        }
+        if(dia>maximo_dias)
+        {
+            printf("\n(Erro: o mês %d do ano %d não possui %d dias)", mes, ano, dia);
+        }
+        else
+        {
+            isValido = 1;
+        }
+    }
+    else
+    {
+        printf("\n(Erro: Data fora dos intervalos pretendidos)");
+    }
+    return isValido;
+}
+
+
+int validarAnoLetivo(char anoLetivo[])
+{
+    int isAnoValido,anoLetivoInicial,anoLetivoFinal,valido=0,ultimosDigitos;
+
+    isAnoValido = sscanf(anoLetivo, "%d-%d", &anoLetivoInicial, &anoLetivoFinal);
+
+    ultimosDigitos = obterDigitosAno(anoLetivoInicial);
+
+    if(isAnoValido==2)
+    {
+        if(anoLetivoInicial > anoLetivoFinal && anoLetivoFinal > ultimosDigitos )
+        {
+            valido = 1;
+        }
+        else
+        {
+            printf("\nO ano letivo não é válido,tente novamente: ");
+        }
+    }
+    else
+    {
+        printf("\nO ano letivo deve seguir a seguinte estrutura: 1111-11,tente novamente: ");
+    }
+
+    return valido;
 }
 
 void lerNumCardinal(char* resultado,int len,char sufixo[],int max,int min)
@@ -521,6 +698,7 @@ int procurar_unidade_curricular(t_unidade_curricular vetor_ucs[],int numero_ucs,
     return encontrado;
 }
 
+
 // Função para ler e validar um endereço de email de um estudante
 // Recebe como parâmetro o vetor dos estudantes e um índice para adicionar o email válido ao vetor
 int validar_email_estudante(char email[],t_estudante vetor_estudantes[],int numero_estudantes)
@@ -554,6 +732,8 @@ int validar_email_estudante(char email[],t_estudante vetor_estudantes[],int nume
     }
     return valido;
 }
+
+
 
 void ler_email_estudante(t_estudante vetor_estudantes[],int numero_estudantes,int indice_especifico)
 {
@@ -605,6 +785,29 @@ void mostrar_dados_estudantes(t_estudante vetor_estudantes[], int numero_estudan
                vetor_estudantes[indice].email);
     }
     printf("----|--------------------------------------------------------------------------------|---------------------|--------------|-------\n");
+    fflush(stdin);
+    getchar();
+}
+
+void mostrar_dados_avaliacoes(t_avaliacao vetor_avaliacoes[], int numero_avaliacoes)
+{
+    printf("ID  | ID Estudante | ID UC | Classificação Final | Ano Letivo | Época de Avaliação | Data Avaliação\n");
+    printf("----|--------------|-------|---------------------|------------|--------------------|---------------\n");
+
+    for (int indice = 0; indice < numero_avaliacoes; indice++)
+    {
+        printf("%-4d| %-13d| %-6d| %-20d| %-11s| %-19s| %02d/%02d/%04d\n",
+               vetor_avaliacoes[indice].id,
+               vetor_avaliacoes[indice].id_estudante,
+               vetor_avaliacoes[indice].id_uc,
+               vetor_avaliacoes[indice].classificao_final,
+               vetor_avaliacoes[indice].ano_letivo,
+               vetor_avaliacoes[indice].epoca_avaliacao,
+               vetor_avaliacoes[indice].data_avaliacao.dia,
+               vetor_avaliacoes[indice].data_avaliacao.mes,
+               vetor_avaliacoes[indice].data_avaliacao.ano);
+    }
+    printf("----|--------------|-------|---------------------|------------|--------------------|---------------\n");
     fflush(stdin);
     getchar();
 }
@@ -751,9 +954,7 @@ int verificarNumAlunoExistente(t_estudante vetor_estudantes[],int numero_estudan
         indice_estudante = procurar_estudante(vetor_estudantes,numero_estudantes,numero_estudante);
         if(indice_estudante == -1)
         {
-            printf("\n(Erro:O aluno com o número de estudante %d não existe),tente novamente:",numero_estudante);
-            fflush(stdin);
-            getchar();
+            printf("\n(Erro:O aluno com o número de estudante %d não existe),tente novamente: ",numero_estudante);
         }
     }
     while(indice_estudante == -1);
@@ -771,9 +972,7 @@ int verificarNumAlunoInexistente(t_estudante vetor_estudantes[],int numero_estud
         indice_estudante = procurar_estudante(vetor_estudantes,numero_estudantes,numero_estudante);
         if(indice_estudante != -1)
         {
-            printf("\n(Erro: O aluno já existe!),tente novamente:");
-            fflush(stdin);
-            getchar();
+            printf("\n(Erro: O aluno já existe!),tente novamente: ");
         }
     }
     while(indice_estudante !=-1);
@@ -790,9 +989,7 @@ int verificarUcExistente(t_unidade_curricular vetor_ucs[],int numero_ucs)
         indice_uc = procurar_unidade_curricular(vetor_ucs,numero_ucs,codigo_uc);
         if(indice_uc == -1)
         {
-            printf("\n(Erro:A unidade curricular com o código %d não existe),tente novamente:",codigo_uc);
-            fflush(stdin);
-            getchar();
+            printf("\n(Erro:A unidade curricular com o código %d não existe),tente novamente: ",codigo_uc);
         }
     }
     while(indice_uc == -1);
@@ -810,14 +1007,29 @@ int verificarUcInexistente(t_unidade_curricular vetor_ucs[],int numero_ucs)
         indice_uc = procurar_unidade_curricular(vetor_ucs,numero_ucs,codigo_uc);
         if(indice_uc != -1)
         {
-            printf("\n(Erro: A unidade curricular já existe!),tente novamente:");
-            fflush(stdin);
-            getchar();
+            printf("\n(Erro: A unidade curricular já existe!),tente novamente: ");
         }
     }
     while(indice_uc !=-1);
 
     return codigo_uc;
+}
+
+int verificarAnoBissexto(int ano)
+{
+    int isBissexto;
+
+    if((ano % 4 == 0) && (ano % 100!=0) || (ano%400==0))
+    {
+        isBissexto = 1;
+    }
+    else
+    {
+        isBissexto = 0;
+    }
+
+    return isBissexto;
+
 }
 
 
@@ -892,8 +1104,7 @@ int lerFicheiroEstudantes(t_estudante vetor_estudantes[])
     ficheiro = fopen("estudantes.dat","rb");
     if(ficheiro == NULL)
     {
-        printf("Não foi posível ler o ficheiro");
-        printf("O ficheiro não existe. Será criado um novo ficheiro vazio.\n");
+        printf("\nO ficheiro dos estudantes não existe. Será criado um novo ficheiro vazio.\n");
         ficheiro = fopen("estudantes.dat", "wb");
         if (ficheiro != NULL)
         {
@@ -927,8 +1138,7 @@ int lerFicheiroUcs(t_unidade_curricular vetor_ucs[])
     ficheiro = fopen("unidades_curriculares.dat","rb");
     if(ficheiro == NULL)
     {
-        printf("Não foi posível ler o ficheiro");
-        printf("O ficheiro não existe. Será criado um novo ficheiro vazio.\n");
+        printf("\nO ficheiro das unidades curriculares não existe. Será criado um novo ficheiro vazio.\n");
         ficheiro = fopen("unidades_curriculares.dat", "wb");
         if (ficheiro != NULL)
         {
@@ -962,7 +1172,7 @@ int lerFicheiroAvaliacoes(t_avaliacao vetor_avaliacoes[])
     ficheiro = fopen("avaliacoes.dat","rb");
     if(ficheiro == NULL)
     {
-        printf("O ficheiro não existe. Será criado um novo ficheiro vazio.\n");
+        printf("\nO ficheiro das avaliações não existe. Será criado um novo ficheiro vazio.\n");
         ficheiro = fopen("avaliacoes.dat", "wb");
         if (ficheiro != NULL)
         {
@@ -983,9 +1193,17 @@ int lerFicheiroAvaliacoes(t_avaliacao vetor_avaliacoes[])
         }
         else
         {
-            printf("\nLeitura de %d unidades curriculares do ficheiro com sucesso.",numero_avaliacoes_lido);
+            printf("\nLeitura de %d avaliações do ficheiro com sucesso.",numero_avaliacoes_lido);
         }
     }
 
     return numero_avaliacoes_lido;
+}
+
+//Função para obter os últimos dois digitos de um ano
+int obterDigitosAno(ano)
+{
+    int ultimo;
+    ultimo = ano % 100;
+    return ultimo;
 }
