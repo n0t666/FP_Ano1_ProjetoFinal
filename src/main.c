@@ -24,21 +24,23 @@
 //------------------------------------------------------------------------------------------------
 // CONSTANTES
 //------------------------------------------------------------------------------------------------
-#define MINIMO_NUMERO_ESTUDANTE 2190000
 
 #define MAXIMO_ESTUDANTES 150
 #define MAXIMO_AVALIACOES 5000
 #define MAXIMO_UNIDADES_CURRICULARES 18
 
 #define MAXIMO_NUMERO_ESTUDANTE 2299999
+#define MINIMO_NUMERO_ESTUDANTE 2190000
+
 #define DOMINIO_EMAIL_ESTUDANTES "my.ipleiria.pt"
 
 #define TECLA_ESC 27
 #define TECLA_ENTER 13
 
 #define DATA_MINIMA 2000
-
+#define NOTA_FINAL_MINIMA 10
 //-------------------------------------------------------------------------------------------------
+
 
 
 //------------------------------------------------------------------------------------------------
@@ -57,8 +59,8 @@ typedef struct
 
 typedef struct
 {
-    int id,cod_uc,ects;
-    char nome_uc[50],ano_curricular[20],semestre[20];
+    int id,cod_uc,ects,semestre;
+    char nome_uc[50],ano_curricular[20];
 } t_unidade_curricular;
 
 typedef struct
@@ -69,6 +71,8 @@ typedef struct
 } t_avaliacao;
 //-------------------------------------------------------------------------------------------------
 
+
+
 //------------------------------------------------------------------------------------------------
 // Funções relacionadas com menus e submenujs
 //------------------------------------------------------------------------------------------------
@@ -76,8 +80,8 @@ int menu_principal(void);
 int submenu_estudantes(void);
 int submenu_ucs(void);
 int submenu_avaliacoes(void);
-int submenu_estatisticas_gerais(void);
-int submenu_estatisticas_especificas(void);
+int submenu_estatisticas(void);
+int submenu_ficheiros(void);
 //-------------------------------------------------------------------------------------------------
 
 
@@ -89,6 +93,13 @@ void lerNumCardinal(char* resultado,int len,char sufixo[],int max,int min);
 
 int ler_numero(int valor_min,int valor_max);
 int ler_tecla(void);
+int validarAnoLetivo(char anoLetivo[]);
+int validarData(int dia,int mes,int ano,int max,int min);
+int obterDigitosAno(int ano);
+int obterPrimeirosDigitosAno(int ano);
+int verificarAnoBissexto(int ano);
+int acao_ficheiros(char tipoAcao[]);
+int concatenar_inteiros(int num1,int num2);
 
 char confirmarAcao(char msg[]);
 //-------------------------------------------------------------------------------------------------
@@ -99,13 +110,23 @@ char confirmarAcao(char msg[]);
 // Funções relacionados com os ficheiros
 //------------------------------------------------------------------------------------------------
 
-//Leitura
+//Escrita
 void gravarFicheiroEstudantes(t_estudante vetor_estudantes[],int numero_estudantes);
 void gravarFicheiroUcs(t_unidade_curricular vetor_ucs[],int numero_ucs);
 void gravarFicheiroAvaliacoes(t_avaliacao vetor_avaliacoes[],int numero_avaliacoes);
 
-//Escrita
 
+
+//Leitura
+int lerFicheiroEstudantes(t_estudante vetor_estudantes[]);
+int lerFicheiroUcs(t_unidade_curricular vetor_ucs[]);
+int lerFicheiroAvaliacoes(t_avaliacao vetor_avaliacoes[]);
+
+//Limpeza
+
+void limparFicheiroEstudante(t_estudante vetor_estudantes[]);
+void limparFicheiroUcs(t_unidade_curricular vetor_ucs[]);
+void limparFicheiroAvaliacoes(t_avaliacao vetor_avaliacoes[]);
 
 
 //-------------------------------------------------------------------------------------------------
@@ -115,7 +136,6 @@ void gravarFicheiroAvaliacoes(t_avaliacao vetor_avaliacoes[],int numero_avaliaco
 //------------------------------------------------------------------------------------------------
 // Funções relacionadas com a manipulação da  estrutura de dados estudantes
 //------------------------------------------------------------------------------------------------
-
 void mostrar_dados_estudantes(t_estudante vetor_estudantes[],int numero_estudantes);
 void mostrar_dados_estudante(t_estudante vetor_estudantes[],int indice_estudante);
 void mostrar_editar_estudante(t_estudante vetor_estudantes[],int numero_estudantes,int indice_estudante);
@@ -128,11 +148,10 @@ int validar_email_estudante(char email[],t_estudante vetor_estudantes[],int nume
 int ler_dados_estudante(t_estudante vetor_estudantes[],int numero_estudantes);
 int verificarNumAlunoExistente(t_estudante vetor_estudantes[],int numero_estudantes);
 int verificarNumAlunoInexistente(t_estudante vetor_estudantes[],int numero_estudantes);
-
-
-
-
 //-------------------------------------------------------------------------------------------------
+
+
+
 
 //------------------------------------------------------------------------------------------------
 // Funções relacionadas com a manipulação da  estrutura de dados unidade_curricular
@@ -146,6 +165,34 @@ int verificarUcInexistente(t_unidade_curricular vetors_ucs[],int numero_ucs);
 
 void mostrar_dados_ucs(t_unidade_curricular vetors_ucs[],int numero_ucs);
 void mostrar_dados_uc(t_unidade_curricular vetors_ucs[],int codigo_uc);
+void mostrar_editar_uc(t_unidade_curricular vetor_ucs[],int numero_ucs,int indice_uc);
+//-------------------------------------------------------------------------------------------------
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// Funções relacionadas com a manipulação da  estrutura de dados avaliações
+//------------------------------------------------------------------------------------------------
+int ler_dados_avaliacao(t_avaliacao vetor_avaliacoes[],int numero_avaliacoes,t_estudante vetor_estudantes[],int numero_estudantes,t_unidade_curricular vetor_ucs[],int numero_ucs);
+
+void mostrar_dados_avaliacoes(t_avaliacao vetor_avaliacoes[], int numero_avaliacoes);
+void ler_data_avaliacao(t_avaliacao vetor_avaliacoes[],int indice_avaliacao);
+
+float calcularMediaUcsAprovadas(t_avaliacao vetor_avaliacoes[],int numero_avaliacoes,int id_estudante);
+//-------------------------------------------------------------------------------------------------
+
+
+
+
+//------------------------------------------------------------------------------------------------
+// Funções relacionadas com a obtenção de estatísticas
+//------------------------------------------------------------------------------------------------
+int contarUcsAprovadas(t_avaliacao vetor_avaliacoes[],int numero_avaliacoes,int id_estudante);
+int calcultarTotalEcts(t_avaliacao vetor_avaliacoes[],int numero_avaliacoes,t_unidade_curricular vetor_ucs[],int numero_ucs,int id_estudante);
+
+void estatisticas_aluno(t_avaliacao vetor_avaliacoes[], int numero_avaliacoes,t_unidade_curricular vetor_ucs[],int numero_ucs, int id_estudante,int codigo_estudante);
+void obterDadosEstudantePorSemestre(t_avaliacao vetor_avaliacoes[], int numero_avaliacoes,t_unidade_curricular vetor_ucs[],int numero_ucs, int id_estudante);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -158,7 +205,7 @@ int main(void)
     t_unidade_curricular vetor_ucs[MAXIMO_UNIDADES_CURRICULARES];
     t_avaliacao vetor_avaliacoes[MAXIMO_AVALIACOES];
 
-    int menu_principal_op,submenu_estudantes_op,submenu_ucs_op,submenu_avaliacoes_op,submenu_estatisticas_op;
+    int menu_principal_op,submenu_estudantes_op,submenu_ucs_op,submenu_avaliacoes_op,submenu_estatisticas_op,submenu_ficheiros_op,submenu_ficheiros_acao_op;
 
     int numero_estudantes=0,numeros_ucs=0,numero_avaliacoes=0;
 
@@ -173,11 +220,9 @@ int main(void)
     printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
     getchar();
 
-
     do
     {
         system("cls||clear");
-
         menu_principal_op=menu_principal();
         switch(menu_principal_op)
         {
@@ -318,6 +363,152 @@ int main(void)
             while(submenu_avaliacoes_op!=0);
             break;
         case 4:
+            if(numeros_ucs > 0 && numero_avaliacoes > 0 && numero_estudantes > 0)
+            {
+                do
+                {
+                    submenu_estatisticas_op=submenu_estatisticas();
+                    switch(submenu_estatisticas_op)
+                    {
+                    case 1:
+                        printf("\nIntroduza o número de estudante que pretende consultar as estatísticas: ");
+                        indice_estudante = verificarNumAlunoExistente(vetor_estudantes,numero_estudantes);
+                        estatisticas_aluno(vetor_avaliacoes,numero_avaliacoes,vetor_ucs,numeros_ucs,vetor_estudantes[indice_estudante].id,vetor_estudantes[indice_estudante].numero_estudante);
+                        break;
+                    }
+
+                }
+                while(submenu_estatisticas_op!=0);
+            }
+            else
+            {
+                printf("\nPara consultar este menu necessita de ter pelo menos 1 unidade curricular,1 avaliação e 1 estudante inserido no sistema");
+                fflush(stdin);
+                printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+                getchar();
+            }
+            break;
+        case 5:
+            do
+            {
+                submenu_ficheiros_op = submenu_ficheiros();
+                switch(submenu_ficheiros_op)
+                {
+                case 1:
+                    submenu_ficheiros_acao_op=acao_ficheiros("guardar");
+                    switch(submenu_ficheiros_acao_op)
+                    {
+                    case 1:
+                        gravarFicheiroEstudantes(vetor_estudantes,numero_estudantes);
+                        fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+                        getchar();
+                        break;
+                        break;
+                    case 2:
+                        gravarFicheiroUcs(vetor_ucs,numeros_ucs);
+                        fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+                        getchar();
+                        break;
+                        break;
+                    case 3:
+                        gravarFicheiroAvaliacoes(vetor_avaliacoes,numero_avaliacoes);
+                        fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+                        getchar();
+                        break;
+                        break;
+                    case 4:
+                        gravarFicheiroEstudantes(vetor_estudantes,numero_estudantes);
+                        gravarFicheiroUcs(vetor_ucs,numeros_ucs);
+                        gravarFicheiroAvaliacoes(vetor_avaliacoes,numero_avaliacoes);
+                        fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+                        getchar();
+                        break;
+                        break;
+                    }
+                    break;
+                case 2:
+                    submenu_ficheiros_acao_op=acao_ficheiros("carregar");
+                    switch(submenu_ficheiros_acao_op)
+                    {
+                    case 1:
+                        memset(vetor_estudantes,0,sizeof(vetor_estudantes));
+                        numero_estudantes = lerFicheiroEstudantes(vetor_estudantes);
+                        fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+                        getchar();
+                        break;
+                    case 2:
+                        memset(vetor_ucs,0,sizeof(vetor_ucs));
+                        numeros_ucs = lerFicheiroUcs(vetor_ucs);
+                        fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+                        getchar();
+                        break;
+                    case 3:
+                        memset(vetor_avaliacoes,0,sizeof(vetor_avaliacoes));
+                        numero_avaliacoes = lerFicheiroAvaliacoes(vetor_avaliacoes);
+                        fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+                        getchar();
+                        break;
+                    case 4:
+                        memset(vetor_estudantes,0,sizeof(vetor_estudantes));
+                        memset(vetor_ucs,0,sizeof(vetor_ucs));
+                        memset(vetor_avaliacoes,0,sizeof(vetor_avaliacoes));
+                        numero_estudantes = lerFicheiroEstudantes(vetor_estudantes);
+                        numeros_ucs = lerFicheiroUcs(vetor_ucs);
+                        numero_avaliacoes = lerFicheiroAvaliacoes(vetor_avaliacoes);
+                        fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+                        getchar();
+                        break;
+                    }
+                    break;
+                case 3:
+                    submenu_ficheiros_acao_op=acao_ficheiros("limpar");
+                    switch(submenu_ficheiros_acao_op)
+                    {
+                    case 1:
+                        numero_estudantes = 0;
+                        limparFicheiroEstudante(vetor_estudantes);
+                        fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+                        getchar();
+                        break;
+                    case 2:
+                        numeros_ucs = 0;
+                        limparFicheiroUcs(vetor_ucs);
+                        fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+                        getchar();
+                        break;
+                    case 3:
+                        numero_avaliacoes = 0;
+                        limparFicheiroAvaliacoes(vetor_avaliacoes);
+                        fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+                        getchar();
+                        break;
+                    case 4:
+                        numero_estudantes = 0;
+                        numeros_ucs = 0;
+                        numero_avaliacoes = 0;
+                        limparFicheiroEstudante(vetor_estudantes);
+                        limparFicheiroUcs(vetor_ucs);
+                        limparFicheiroAvaliacoes(vetor_avaliacoes);
+                        fflush(stdin);
+                        printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+                        getchar();
+                        break;
+                    }
+                    break;
+                }
+            }
+            while(submenu_ficheiros_op!=0);
             break;
         default:
             printf("\nOpção inválida");
@@ -333,6 +524,20 @@ int main(void)
     gravarFicheiroAvaliacoes(vetor_avaliacoes,numero_avaliacoes);
 }
 
+int acao_ficheiros(char tipoAcao[])
+{
+    int op;
+    printf("\nO que deseja %s:\n",tipoAcao);
+    printf("\n1 - Ficheiro 'estudantes'");
+    printf("\n2 - Ficheiro 'unidades_curriculares'");
+    printf("\n3 - Ficheiro 'avaliações'");
+    printf("\n4 - Todos os ficheiros");
+    printf("\n0 - Nenhum");
+    printf("\n\n-->");
+    scanf("%d",&op);
+    return op;
+}
+
 int menu_principal()
 {
     int op;
@@ -343,6 +548,7 @@ int menu_principal()
     printf(" * 2 - Unidades Curriculares              *\n");
     printf(" * 3 - Avaliações                         *\n");
     printf(" * 4 - Estatísticas                       *\n");
+    printf(" * 5 - Ficheiros                          *\n");
     printf(" * 0 - Sair do programa                   *\n");
     printf(" ******************************************\n\n");
     printf(" -->");
@@ -354,15 +560,15 @@ int submenu_estudantes()
 {
     int op;
     system("cls||clear");
-    printf(" ******************************************\n");
-    printf(" *           MENU ESTUDANTES              *\n");
-    printf(" ******************************************\n");
-    printf(" * 1 - Registrar novo aluno               *\n");
-    printf(" * 2 - Listar alunos existentes           *\n");
-    printf(" * 3 - Consultar aluno específico         *\n");
-    printf(" * 4 - Editar aluno específico            *\n");
-    printf(" * 0 - Voltar                             *\n");
-    printf(" ******************************************\n\n");
+    printf(" ************************************************\n");
+    printf(" *                 MENU ESTUDANTES              *\n");
+    printf(" ************************************************\n");
+    printf(" * 1 - Registrar novo aluno                     *\n");
+    printf(" * 2 - Listar alunos existentes                 *\n");
+    printf(" * 3 - Consultar aluno específico               *\n");
+    printf(" * 4 - Editar aluno específico                  *\n");
+    printf(" * 0 - Voltar                                   *\n");
+    printf(" ************************************************\n\n");
     printf(" -->");
     scanf("%d",&op);
     return op;
@@ -403,28 +609,62 @@ int submenu_avaliacoes()
     return op;
 }
 
-int submenu_estatisticas_gerais()
+int submenu_estatisticas()
 {
     int op;
     system("cls||clear");
-    printf(" ************************************************\n");
-    printf(" *           MENU ESTATÍSTICAS ESPECÍFICAS       *\n");
-    printf(" ************************************************\n");
-    printf(" * Total de ECTS aprovados pelos estudantes:     *\n");
-    printf(" * 0 - Voltar                                   *\n");
-    printf(" ************************************************\n\n");
+    printf(" *************************************************\n");
+    printf(" *             MENU ESTATÍSTICAS                 *\n");
+    printf(" *************************************************\n");
+    printf(" * 1 - Mostrar estatísticas estudante            *\n");
+    printf(" * 0 - Voltar                                    *\n");
+    printf(" *************************************************\n\n");
     printf(" -->");
     scanf("%d",&op);
     return op;
+}
+
+int submenu_ficheiros()
+{
+    int op;
+    system("cls||clear");
+    printf(" *************************************************\n");
+    printf(" *                  MENU FICHEIROS               *\n");
+    printf(" *************************************************\n");
+    printf(" * 1 - Guardar ficheiros                         *\n");
+    printf(" * 2 - Carregar ficheiros                        *\n");
+    printf(" * 3 - Limpar ficheiros                          *\n");
+    printf(" * 0 - Voltar                                    *\n");
+    printf(" *************************************************\n\n");
+    printf(" -->");
+    scanf("%d",&op);
+    return op;
+}
+
+
+void estatisticas_aluno(t_avaliacao vetor_avaliacoes[], int numero_avaliacoes,t_unidade_curricular vetor_ucs[],int numero_ucs, int id_estudante,int codigo_estudante)
+{
+    system("cls||clear"); // Limpar o ecrã tanto para Windows como para Linux
+    printf("************************************************\n");
+    printf("*                Estudante Nº%d           *\n",codigo_estudante);
+    printf("************************************************\n\n");
+    printf("Total de UCS aprovadas: %d",contarUcsAprovadas(vetor_avaliacoes,numero_avaliacoes,id_estudante));
+    printf("\nTotal de ECTS obtidos nas UCS aprovadas: %d",calcultarTotalEcts(vetor_avaliacoes,numero_avaliacoes,vetor_ucs,numero_ucs,id_estudante));
+    printf("\nMédia das classificações nas UCS aprovadas: %.2f\n\n",calcularMediaUcsAprovadas(vetor_avaliacoes,numero_avaliacoes,id_estudante));
+    printf("************************************************\n");
+    printf("*          Detalhes por semestre letivos       *\n");
+    printf("************************************************\n\n");
+    obterDadosEstudantePorSemestre(vetor_avaliacoes,numero_avaliacoes,vetor_ucs,numero_ucs,id_estudante);
+    fflush(stdin);
+    printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
+    getchar();
 }
 
 void escolha_epoca_avaliacao(char* str)
 {
     int op;
     printf("\n");
-    printf("************************************************\n");
-    printf("*           Escolha a época de avaliação:      *\n");
-    printf("************************************************\n");
+    printf("Escolha a época de avaliação:\n");
     printf("\n1 -  Avaliação Final Semestre");
     printf("\n2 -  Avaliação De Recurso");
     printf("\n3 -  Avaliação De Época Especial");
@@ -519,7 +759,7 @@ int ler_dados_unidade_curricular(t_unidade_curricular vetor_ucs[],int numero_ucs
     printf("\nAno curricular: ");
     lerNumCardinal(vetor_ucs[numero_ucs].ano_curricular,sizeof(vetor_ucs[numero_ucs].ano_curricular),"º Ano",8,1);
     printf("\nSemestre: ");
-    lerNumCardinal(vetor_ucs[numero_ucs].semestre,sizeof(vetor_ucs[numero_ucs].semestre),"º Semestre",10,1);
+    vetor_ucs[numero_ucs].semestre = ler_numero(1,10);
     printf("\nECTS: ");
     scanf("%d",&vetor_ucs[numero_ucs].ects);
     vetor_ucs[numero_ucs].id = numero_ucs +1;
@@ -540,7 +780,7 @@ int ler_dados_avaliacao(t_avaliacao vetor_avaliacoes[],int numero_avaliacoes,t_e
     printf("*                 Avaliação  Nº%d              *\n",numero_avaliacoes+1);
     printf("************************************************\n\n");
     vetor_avaliacoes[numero_avaliacoes].id = numero_avaliacoes + 1;
-    printf("\nNúmero do aluno: ");
+    printf("Número do aluno: ");
     indice_estudante= verificarNumAlunoExistente(vetor_estudantes,numero_estudantes);
     printf("\nCódigo da unidade curricular: ");
     indice_uc = verificarUcExistente(vetor_ucs,numero_ucs);
@@ -569,16 +809,21 @@ int ler_dados_avaliacao(t_avaliacao vetor_avaliacoes[],int numero_avaliacoes,t_e
 
 void ler_data_avaliacao(t_avaliacao vetor_avaliacoes[],int indice_avaliacao)
 {
-    int dia,mes,ano,dataValida;
+    int dia,mes,ano,dataValida,max,min,seculo;
+
+
+    sscanf(vetor_avaliacoes[indice_avaliacao].ano_letivo,"%d-%d",&min,&max);
+    seculo = obterPrimeirosDigitosAno(min);
+    max = concatenar_inteiros(seculo,max);
 
     printf("\nData (DIA/MÊS/ANO): ");
     do
     {
         scanf("%d/%d/%d",&dia,&mes,&ano);
-        dataValida = validarData(dia,mes,ano);
+        dataValida = validarData(dia,mes,ano, max, min);
         if(dataValida !=1)
         {
-            printf("\Introduza a data novamente: ");
+            printf("\nIntroduza a data novamente: ");
         }
     }
     while(dataValida!=1);
@@ -589,10 +834,10 @@ void ler_data_avaliacao(t_avaliacao vetor_avaliacoes[],int indice_avaliacao)
 }
 
 
-int validarData(int dia,int mes,int ano)
+int validarData(int dia,int mes,int ano,int max,int min)
 {
     int isValido = 0,maximo_dias = 31;
-    if( ano >= DATA_MINIMA && mes > 0 && mes <= 12 && dia > 1)
+    if( ano >= min && ano <=max && mes > 0 && mes <= 12 && dia > 1)
     {
         if(mes == 4 || mes == 6 || mes == 9 || mes == 11)
         {
@@ -773,30 +1018,43 @@ int procurar_email_estudante(char email[],t_estudante vetor_estudantes[],int num
 
 void mostrar_dados_estudantes(t_estudante vetor_estudantes[], int numero_estudantes)
 {
-    printf("ID  | Nome                                                                           | Número de estudante | Código Curso | Email\n");
-    printf("----|--------------------------------------------------------------------------------|---------------------|--------------|-------\n");
+    system("cls||clear");
+    printf("*********************************************************************************************************************************\n");
+    printf("*                                                                                                                               *\n");
+    printf("*                                               ESTUDANTES EXISTENTES (Total estudantes: %d)                                    *\n",numero_estudantes);
+    printf("*                                                                                                                               *\n");
+    printf("*********************************************************************************************************************************\n");
+    printf("\nID  | Nome                                                                           | Número de estudante | Código Curso | Email\n");
+    printf("----|--------------------------------------------------------------------------------|---------------------|--------------|--------------------------------\n");
     for (int indice = 0; indice < numero_estudantes; indice++)
     {
-        printf("%-4d| %-78s | %-19d | %-12d | %s\n",
+        printf("%-4d| %-78s | %-19d | %-12d | %-30s\n",
                vetor_estudantes[indice].id,
                vetor_estudantes[indice].nome,
                vetor_estudantes[indice].numero_estudante,
                vetor_estudantes[indice].cod_curso,
                vetor_estudantes[indice].email);
     }
-    printf("----|--------------------------------------------------------------------------------|---------------------|--------------|-------\n");
+    printf("----|--------------------------------------------------------------------------------|---------------------|--------------|--------------------------------\n");
     fflush(stdin);
+    printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
     getchar();
 }
 
 void mostrar_dados_avaliacoes(t_avaliacao vetor_avaliacoes[], int numero_avaliacoes)
 {
-    printf("ID  | ID Estudante | ID UC | Classificação Final | Ano Letivo | Época de Avaliação | Data Avaliação\n");
-    printf("----|--------------|-------|---------------------|------------|--------------------|---------------\n");
+    system("cls||clear");
+    printf("******************************************************************************************************\n");
+    printf("*                                                                                                    *\n");
+    printf("*                               AVALIAÇÕES EXISTENTES (Total avaliações: %d)                          *\n",numero_avaliacoes);
+    printf("*                                                                                                    *\n");
+    printf("******************************************************************************************************\n");
+    printf("\nID  | ID Estudante | ID UC | Classificação Final | Ano Letivo |   Época de Avaliação                   | Data Avaliação\n");
+    printf("----|--------------|-------|---------------------|------------|----------------------------------------|---------------\n");
 
     for (int indice = 0; indice < numero_avaliacoes; indice++)
     {
-        printf("%-4d| %-13d| %-6d| %-20d| %-11s| %-19s| %02d/%02d/%04d\n",
+        printf("%-4d| %-13d| %-6d| %-20d| %-11s| %-39s| %02d/%02d/%04d\n",
                vetor_avaliacoes[indice].id,
                vetor_avaliacoes[indice].id_estudante,
                vetor_avaliacoes[indice].id_uc,
@@ -807,14 +1065,17 @@ void mostrar_dados_avaliacoes(t_avaliacao vetor_avaliacoes[], int numero_avaliac
                vetor_avaliacoes[indice].data_avaliacao.mes,
                vetor_avaliacoes[indice].data_avaliacao.ano);
     }
-    printf("----|--------------|-------|---------------------|------------|--------------------|---------------\n");
+    printf("----|--------------|-------|---------------------|------------|----------------------------------------|---------------\n");
     fflush(stdin);
+    printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
     getchar();
 }
 
 void mostrar_dados_estudante(t_estudante vetor_estudantes[], int indice_estudante)
 {
+
     system("cls||clear");
+    printf("\n\n");
     printf(" **********************************************************************************************\n");
     printf("                                        ALUNO Nº.%d                                            \n",vetor_estudantes[indice_estudante].numero_estudante);
     printf(" **********************************************************************************************\n");
@@ -831,11 +1092,18 @@ void mostrar_dados_estudante(t_estudante vetor_estudantes[], int indice_estudant
 
 void mostrar_dados_ucs(t_unidade_curricular vetor_ucs[],int numero_ucs)
 {
-    printf("ID  | Nome da UC                                       | Código da UC | Ano curricular | Semestre      | ECTS\n");
+    system("cls||clear");
+    printf("**************************************************************************************************************\n");
+    printf("*                                                                                                            *\n");
+    printf("*                                UNIDADES CURRICULARES EXISTENTES (Total UCS: %d)                             *\n", numero_ucs);
+    printf("*                                                                                                            *\n");
+    printf("**************************************************************************************************************\n");
+
+    printf("\nID  | Nome da UC                                       | Código da UC | Ano curricular | Semestre      | ECTS \n");
     printf("----|--------------------------------------------------|--------------|----------------|---------------|------\n");
     for (int indice = 0; indice < numero_ucs; indice++)
     {
-        printf("%-4d| %-48s | %-12d | %-14s | %-13s | %-6d\n",
+        printf("%-4d| %-48s | %-12d | %-14s | %-3dº Semestre | %-6d\n",
                vetor_ucs[indice].id,
                vetor_ucs[indice].nome_uc,
                vetor_ucs[indice].cod_uc,
@@ -846,6 +1114,7 @@ void mostrar_dados_ucs(t_unidade_curricular vetor_ucs[],int numero_ucs)
     }
     printf("----|--------------------------------------------------|--------------|----------------|---------------|------\n");
     fflush(stdin);
+    printf("\n\nPRESSIONE <ENTER> PARA CONTINUAR...");
     getchar();
 
 }
@@ -859,7 +1128,7 @@ void mostrar_dados_uc(t_unidade_curricular vetor_ucs[],int codigo_uc)
     printf("   Código da UC: %d                                                                            \n",vetor_ucs[codigo_uc].cod_uc);
     printf("   Nome: %s                                                                                    \n",vetor_ucs[codigo_uc].nome_uc);
     printf("   Ano curricular: %s                                                                          \n",vetor_ucs[codigo_uc].ano_curricular);
-    printf("   Semestre: %s                                                                                \n",vetor_ucs[codigo_uc].semestre);
+    printf("   Semestre: %d º Semestre                                                                     \n",vetor_ucs[codigo_uc].semestre);
     printf("   ECTS: %d                                                                                    \n",vetor_ucs[codigo_uc].ects);
     printf(" **********************************************************************************************\n\n");
     fflush(stdin);
@@ -936,7 +1205,7 @@ void mostrar_editar_uc(t_unidade_curricular vetor_ucs[],int numero_ucs,int indic
         if(confirmarAcao("Deseja editar o semestre da UC?")=='S')
         {
             printf("\nNovo semestre: ");
-            lerNumCardinal(vetor_ucs[indice_uc].semestre,sizeof(vetor_ucs[indice_uc].semestre),"º Semestre",10,1);
+            vetor_ucs[indice_uc].semestre = ler_numero(1,10);
         }
         printf("-----------------------------------------------");
         sair = confirmarAcao("Continuar no modo edição?");
@@ -1019,7 +1288,8 @@ int verificarAnoBissexto(int ano)
 {
     int isBissexto;
 
-    if((ano % 4 == 0) && (ano % 100!=0) || (ano%400==0))
+    if ((ano % 4 == 0) && ((ano % 100 != 0) || (ano % 400 == 0)))
+
     {
         isBissexto = 1;
     }
@@ -1200,10 +1470,195 @@ int lerFicheiroAvaliacoes(t_avaliacao vetor_avaliacoes[])
     return numero_avaliacoes_lido;
 }
 
+void limparFicheiroEstudante(t_estudante vetor_estudantes[])
+{
+    FILE *ficheiro;
+    ficheiro = fopen("estudantes.dat","wb");
+    if(ficheiro == NULL)
+    {
+        printf("\nNão foi possível limpar o ficheiro das avaliações.\n");
+
+    }
+    else
+    {
+        printf("\nO ficheiro das unidades curriculares foi limpo com sucesso!\n");
+        memset(vetor_estudantes,0,sizeof(vetor_estudantes));
+    }
+    fclose(ficheiro);
+    getchar();
+
+}
+
+void limparFicheiroUcs(t_unidade_curricular vetor_ucs[])
+{
+    FILE *ficheiro;
+    ficheiro = fopen("unidades_curriculares.dat","wb");
+    if(ficheiro == NULL)
+    {
+        printf("\nNão foi possível limpar o ficheiro das avaliações.\n");
+
+    }
+    else
+    {
+        printf("\nO ficheiro das unidades curriculares foi limpo com sucesso!\n");
+        memset(vetor_ucs,0,sizeof(vetor_ucs));
+    }
+    fclose(ficheiro);
+}
+
+
+void limparFicheiroAvaliacoes(t_avaliacao vetor_avaliacoes[])
+{
+    FILE *ficheiro;
+    ficheiro = fopen("avaliacoes.dat","wb");
+    if(ficheiro == NULL)
+    {
+        printf("\nNão foi possível limpar o ficheiro das avaliações.\n");
+
+    }
+    else
+    {
+        printf("\nO ficheiro das avaliações foi limpo com sucesso!\n");
+        memset(vetor_avaliacoes,0,sizeof(vetor_avaliacoes));
+    }
+    fclose(ficheiro);
+}
+
 //Função para obter os últimos dois digitos de um ano
-int obterDigitosAno(ano)
+int obterDigitosAno(int ano)
 {
     int ultimo;
     ultimo = ano % 100;
     return ultimo;
 }
+
+//Função para obter os primeiros dois digitos de um ano
+int obterPrimeirosDigitosAno(int ano)
+{
+    int primeiro;
+    primeiro = ano / 100;
+    return primeiro;
+}
+
+int contarUcsAprovadas(t_avaliacao vetor_avaliacoes[],int numero_avaliacoes,int id_estudante)
+{
+    int totalUcsAprovadas = 0;
+    for(int indice = 0; indice<numero_avaliacoes; indice++)
+    {
+        if(vetor_avaliacoes[indice].id_estudante == id_estudante && vetor_avaliacoes[indice].classificao_final >=NOTA_FINAL_MINIMA)
+        {
+            totalUcsAprovadas++;
+        }
+    }
+
+    return totalUcsAprovadas;
+}
+
+int calcultarTotalEcts(t_avaliacao vetor_avaliacoes[],int numero_avaliacoes,t_unidade_curricular vetor_ucs[],int numero_ucs,int id_estudante)
+{
+    int totalEcts = 0;
+    for(int indice = 0; indice<numero_avaliacoes; indice++)
+    {
+        if(vetor_avaliacoes[indice].id_estudante == id_estudante && vetor_avaliacoes[indice].classificao_final >=NOTA_FINAL_MINIMA)
+        {
+            for (int indiceUcs = 0; indiceUcs<numero_ucs; indiceUcs++)
+            {
+                if(vetor_avaliacoes[indice].id_uc == vetor_ucs[indiceUcs].id)
+                {
+                    totalEcts += vetor_ucs[indiceUcs].ects;
+                }
+            }
+        }
+    }
+
+    return totalEcts;
+}
+
+float calcularMediaUcsAprovadas(t_avaliacao vetor_avaliacoes[],int numero_avaliacoes,int id_estudante)
+{
+    int numeroUcsAprovadas = contarUcsAprovadas(vetor_avaliacoes, numero_avaliacoes, id_estudante);
+    int somaNotas = 0;
+    float media;
+
+    for(int indice = 0; indice<numero_avaliacoes; indice++)
+    {
+        if(vetor_avaliacoes[indice].id_estudante == id_estudante && vetor_avaliacoes[indice].classificao_final >=NOTA_FINAL_MINIMA)
+        {
+            somaNotas += vetor_avaliacoes[indice].classificao_final;
+        }
+    }
+
+    media = (float)somaNotas / numeroUcsAprovadas;
+
+    return media;
+}
+
+
+int procurar_maior_semestre(t_unidade_curricular vetor_ucs[],int numero_ucs)
+{
+    int maior = 0;
+
+    for (int indice = 0; indice<numero_ucs; indice++)
+    {
+        if (vetor_ucs[indice].semestre > maior)
+        {
+            maior = vetor_ucs[indice].semestre;
+        }
+
+    }
+    return maior;
+}
+
+void obterDadosEstudantePorSemestre(t_avaliacao vetor_avaliacoes[], int numero_avaliacoes,t_unidade_curricular vetor_ucs[],int numero_ucs, int id_estudante)
+{
+    int numeroSemestres = procurar_maior_semestre(vetor_ucs,numero_ucs);
+
+    int numeroNotasSemestre,numeroNotasAprovadasSemestre;
+    float percentagem_aprovados;
+
+
+    for (int semestre = 1; semestre <= numeroSemestres; semestre++)
+    {
+        numeroNotasSemestre = 0;
+        numeroNotasAprovadasSemestre = 0;
+        for (int indiceUc = 0; indiceUc < numero_ucs; indiceUc++)
+        {
+            if(vetor_ucs[indiceUc].semestre == semestre)
+            {
+                for (int indiceAvaliacoes = 0; indiceAvaliacoes < numero_avaliacoes; indiceAvaliacoes++)
+                {
+                    if(vetor_avaliacoes[indiceAvaliacoes].id_estudante == id_estudante && vetor_avaliacoes[indiceAvaliacoes].id_uc == vetor_ucs[indiceUc].id)
+                    {
+                        numeroNotasSemestre++;
+
+
+                        if(vetor_avaliacoes[indiceAvaliacoes].classificao_final>=NOTA_FINAL_MINIMA)
+                        {
+                            numeroNotasAprovadasSemestre++;
+                        }
+
+                    }
+                }
+            }
+        }
+        if(numeroNotasSemestre > 0)
+        {
+            percentagem_aprovados = (float)numeroNotasAprovadasSemestre / numeroNotasSemestre * 100.0;
+            printf("Semestre %d: %.2f%% de notas aprovadas (%d aprovadas de %d)\n", semestre, percentagem_aprovados,numeroNotasAprovadasSemestre,numeroNotasSemestre);
+        }
+        else
+        {
+            printf("Semestre %d: Não existem dados insuficientes\n", semestre);
+        }
+    }
+}
+
+int concatenar_inteiros(int num1,int num2)
+{
+    int resultado;
+    char str[100];
+    sprintf(str,"%d%d",num1,num2);
+    resultado = strtol(str, NULL, 10);
+    return resultado;
+}
+
