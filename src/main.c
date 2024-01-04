@@ -2,6 +2,7 @@
  *
  * Autores:
  *  - Leandro Alves Pereira <223175@my.ipleiria.pt> <PL2>
+ *  - Henrique Grilo Soares <2231678@my.ipleiria.pt> <PL2>
  *
  * Data:
  *
